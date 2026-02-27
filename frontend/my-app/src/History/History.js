@@ -1,31 +1,28 @@
-import React from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components';
 import { useGlobalContext } from '../context/globalContext';
 
 function History() {
-    const {transactionHistory} = useGlobalContext()
-
+    const { transactionHistory } = useGlobalContext()
     const [...history] = transactionHistory()
 
     return (
         <HistoryStyled>
-            <h2>Recent History</h2>
-            {history.map((item) =>{
-                const {_id, title, amount, type} = item
+            <div className="history-header">
+                <h2>Recent History</h2>
+                <span className="count-badge">{history.length} items</span>
+            </div>
+            {history.length === 0 && (
+                <div className="history-empty">No recent transactions</div>
+            )}
+            {history.map((item) => {
+                const { _id, title, amount, type } = item
+                const isExpense = type === 'expense'
                 return (
-                    <div key={_id} className="history-item">
-                        <p style={{
-                            color: type === 'expense' ? 'red' : 'var(--color-green)'
-                        }}>
-                            {title}
-                        </p>
-
-                        <p style={{
-                            color: type === 'expense' ? 'red' : 'var(--color-green)'
-                        }}>
-                            {
-                                type === 'expense' ? `-${amount <= 0 ? 0 : amount}` : `+${amount <= 0 ? 0: amount}`
-                            }
+                    <div key={_id} className={`history-item ${isExpense ? 'expense' : 'income'}`}>
+                        <div className="history-icon">{isExpense ? '📉' : '📈'}</div>
+                        <p className="history-title">{title}</p>
+                        <p className={`history-amount ${isExpense ? 'neg' : 'pos'}`}>
+                            {isExpense ? `−$${amount <= 0 ? 0 : amount}` : `+$${amount <= 0 ? 0 : amount}`}
                         </p>
                     </div>
                 )
@@ -34,66 +31,61 @@ function History() {
     )
 }
 
+const slideIn = keyframes`
+  from { opacity:0; transform: translateX(-8px); }
+  to   { opacity:1; transform: translateX(0); }
+`;
+
 const HistoryStyled = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
 
-    /* Container for the history items */
-    .history-item {
-        background: #FCF6F9;
-        border: 2px solid #FFFFFF;
-        box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-        padding: 1rem;
-        border-radius: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        transition: all 0.3s ease-in-out;
-
-        /* Hover effect for history items */
-        &:hover {
-            background: #F1E3F3;
-            transform: translateY(-5px);
-            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Adding subtle active click effect */
-        &:active {
-            transform: scale(0.98);
-        }
-
-        /* Transition for smooth background change */
-        &:not(:hover) {
-            transition: background 0.3s ease-in-out;
-        }
-        
-        /* Adding subtle animation on load for the items */
-        animation: fadeIn 0.3s ease-out;
-        
-        /* Keyframes for fade-in animation */
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+    .history-header {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 0.4rem;
+        h2 { font-size: 1rem; font-weight: 800; color: rgba(255,255,255,0.9); }
+        .count-badge {
+            font-size: 0.72rem; font-weight: 600; color: rgba(167,139,250,0.9);
+            background: rgba(124,58,237,0.15); padding: 0.2rem 0.6rem;
+            border-radius: 50px; border: 1px solid rgba(124,58,237,0.2);
         }
     }
 
-    /* Optional: Add a hover effect for any icon or additional elements inside the history item */
-    .history-item i {
-        font-size: 1.5rem;
-        color: rgba(34, 34, 96, 0.6);
-        transition: all 0.3s ease;
+    .history-empty {
+        text-align: center; font-size: 0.85rem;
+        color: rgba(255,255,255,0.3); padding: 1rem;
+    }
+
+    .history-item {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 0.6rem 0.9rem; border-radius: 10px;
+        display: flex; align-items: center; gap: 0.6rem;
+        transition: all 0.22s ease;
+        animation: ${slideIn} 0.3s ease both;
+
+        &.income  { border-left: 3px solid #10B981; }
+        &.expense { border-left: 3px solid #F43F5E; }
 
         &:hover {
-            color: rgba(34, 34, 96, 1);
-            transform: scale(1.1);
+            background: rgba(255,255,255,0.08);
+            transform: translateX(3px);
+        }
+
+        .history-icon { font-size: 0.9rem; flex-shrink: 0; }
+
+        .history-title {
+            flex: 1; font-size: 0.82rem; font-weight: 600;
+            color: rgba(255,255,255,0.75);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .history-amount {
+            font-size: 0.82rem; font-weight: 800; white-space: nowrap; flex-shrink: 0;
+            &.pos { color: #34D399; }
+            &.neg { color: #FB7185; }
         }
     }
 `;

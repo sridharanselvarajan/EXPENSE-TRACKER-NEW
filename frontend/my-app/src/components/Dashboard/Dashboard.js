@@ -1,74 +1,93 @@
-    import React, { useEffect } from 'react'
-    import styled from 'styled-components';
-import { InnerLayout } from '../../styles/Layouts';
-import Chart from '../Chart/Chart';
+import { useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { useGlobalContext } from '../../context/globalContext';
-import { dollar } from '../../utils/Icons';
 import History from '../../History/History';
+import { InnerLayout } from '../../styles/Layouts';
+import { dollar } from '../../utils/Icons';
+import Chart from '../Chart/Chart';
 
-    function Dashboard() {
-        const{incomes, expenses,totalExpenses, totalIncome, totalBalance, getIncomes,getExpenses,transactionHistory} =  useGlobalContext()
+function Dashboard() {
+    const { incomes, expenses, totalExpenses, totalIncome, totalBalance, getIncomes, getExpenses } = useGlobalContext();
 
-        useEffect(() => {
-            getIncomes()
-            getExpenses()
-        },[])
+    useEffect(() => {
+        getIncomes();
+        getExpenses();
+    }, []);
+
     return (
         <DashboardStyled>
             <InnerLayout>
-                <h1>All Transactions</h1>
+                <div className="page-header">
+                    <h1>Dashboard</h1>
+                    <span className="header-badge">📊 Overview</span>
+                </div>
                 <div className='stats-con'>
                     <div className='chart-con'>
-                        <Chart/>
+                        <Chart />
                         <div className="amount-con">
-                        <div className='income'>
-                            <h2>Total Income</h2>
-                            <p>
-                                {dollar} {totalIncome()}
-                            </p>
+                            <div className='income card-stat' style={{ '--delay': '0.1s' }}>
+                                <div className="card-icon">📈</div>
+                                <h2>Total Income</h2>
+                                <p>{dollar} {totalIncome()}</p>
+                                <div className="card-glow" />
+                            </div>
+                            <div className='expense card-stat' style={{ '--delay': '0.2s' }}>
+                                <div className="card-icon">📉</div>
+                                <h2>Total Expenses</h2>
+                                <p>{dollar} {totalExpenses()}</p>
+                                <div className="card-glow" />
+                            </div>
+                            <div className="balance card-stat" style={{ '--delay': '0.3s' }}>
+                                <div className="card-icon">💎</div>
+                                <h2>Total Balance</h2>
+                                <p>{dollar} {totalBalance()}</p>
+                                <div className="card-glow" />
+                            </div>
                         </div>
-                        <div className='expense'>
-                            <h2>Total Expenses</h2>
-                            <p>
-                                {dollar} {totalExpenses()}
-                            </p>
-                        </div>
-                        <div className="balance">
-                            <h2>Total  Balance</h2>
-                            <p>
-                                {dollar} {totalBalance()}
-                            </p>
-                        </div>
-                        </div>
-
                     </div>
                     <div className="history-con">
-                        <History/>
-                        <h2 className="salary-title">Min <span>Salary</span>Max</h2>
+                        <History />
+                        <h2 className="salary-title">Min <span>Salary</span> Max</h2>
                         <div className="salary-item">
-                            <p>
-                                {Math.min(...incomes.map(item => item.amount))}
-                            </p>
-                            <p>
-                                {Math.max(...incomes.map(item => item.amount))}
-                            </p>
+                            <p>{Math.min(...incomes.map(item => item.amount))}</p>
+                            <p>{Math.max(...incomes.map(item => item.amount))}</p>
                         </div>
-                        <h2 className="salary-title">Min <span>Expenses</span>Max</h2>
+                        <h2 className="salary-title">Min <span>Expenses</span> Max</h2>
                         <div className="salary-item">
-                            <p>
-                                {Math.min(...expenses.map(item => item.amount))}
-                            </p>
-                            <p>
-                                {Math.max(...expenses.map(item => item.amount))}
-                            </p>
+                            <p>{Math.min(...expenses.map(item => item.amount))}</p>
+                            <p>{Math.max(...expenses.map(item => item.amount))}</p>
                         </div>
                     </div>
                 </div>
             </InnerLayout>
         </DashboardStyled>
-    )
+    );
+}
+
+const slideUpCard = keyframes`
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+`;
+const balancePulse = keyframes`
+  0%, 100% { box-shadow: 0 8px 30px rgba(59,130,246,0.3), 0 0 0 0 rgba(59,130,246,0.3); }
+  50%       { box-shadow: 0 8px 30px rgba(59,130,246,0.5), 0 0 0 12px rgba(59,130,246,0); }
+`;
+
+const DashboardStyled = styled.div`
+    .page-header {
+        display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+        h1 {
+            font-size: 1.8rem; font-weight: 800;
+            background: linear-gradient(135deg, #A78BFA, #C4B5FD);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .header-badge {
+            padding: 0.3rem 0.9rem;
+            background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 50px; font-size: 0.8rem; font-weight: 600; color: #A78BFA;
+        }
     }
-    const DashboardStyled = styled.div`
+
     .stats-con {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -81,122 +100,58 @@ import History from '../../History/History';
             .amount-con {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 2rem;
+                gap: 1.2rem;
                 margin-top: 2rem;
 
-                .income, .expense {
-                    grid-column: span 2;
-                }
-
-                .income, .expense, .balance {
-                    background: linear-gradient(135deg, #7EBF7E, #A6E4A6);  /* Slightly darker green gradient */
-                    border: 2px solid #FFFFFF;
-                    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-                    border-radius: 20px;
-                    padding: 1rem;
-                    transition: all 0.3s ease;
+                .card-stat {
                     position: relative;
+                    border-radius: 18px;
+                    padding: 1.1rem;
+                    border: 1px solid rgba(255,255,255,0.12);
                     overflow: hidden;
+                    animation: ${slideUpCard} 0.6s cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0s) both;
+                    transition: all 0.3s ease;
+                    cursor: default;
 
-                    p {
-                        font-size: 3.5rem;
-                        font-weight: 700;
-                        color: white;
-                        z-index: 1;
+                    .card-icon { font-size: 1.3rem; margin-bottom: 0.3rem; }
+
+                    h2 {
+                        font-size: 0.78rem; font-weight: 600;
+                        color: rgba(255,255,255,0.75);
+                        margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;
+                    }
+
+                    p { font-size: 2rem; font-weight: 800; color: white; line-height: 1.1; }
+
+                    .card-glow {
+                        position: absolute; inset: 0;
+                        background: rgba(255,255,255,0);
+                        transition: background 0.3s ease; border-radius: inherit;
                     }
 
                     &:hover {
-                        background: linear-gradient(135deg, #A6E4A6, #7EBF7E);  /* Inverted dark green gradient */
-                        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
-                        transform: translateY(-3px);
-                    }
-
-                    &:hover::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: rgba(255, 255, 255, 0.2);
-                        z-index: 0;
+                        transform: translateY(-4px) scale(1.02);
+                        box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+                        .card-glow { background: rgba(255,255,255,0.06); }
                     }
                 }
 
+                .income {
+                    grid-column: span 2;
+                    background: linear-gradient(135deg, #059669, #10B981, #34D399);
+                    box-shadow: 0 6px 24px rgba(16,185,129,0.3);
+                }
                 .expense {
                     grid-column: span 2;
-                    background: linear-gradient(135deg,rgb(244, 145, 145), #FF9999);  /* Slightly darker red gradient */
-                    border: 2px solid #FFFFFF;
-                    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-                    border-radius: 20px;
-                    padding: 1rem;
-                    transition: all 0.3s ease;
-                    position: relative;
-                    overflow: hidden;
-
-                    p {
-                        font-size: 3.5rem;
-                        font-weight: 700;
-                        color: white;
-                        z-index: 1;
-                    }
-
-                    &:hover {
-                        background: linear-gradient(135deg, #FF9999, #FF6666);  /* Inverted darker red gradient */
-                        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
-                        transform: translateY(-3px);
-                    }
-
-                    &:hover::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: rgba(255, 255, 255, 0.2);
-                        z-index: 0;
-                    }
+                    background: linear-gradient(135deg, #BE123C, #F43F5E, #FB7185);
+                    box-shadow: 0 6px 24px rgba(244,63,94,0.3);
                 }
-
                 .balance {
                     grid-column: 2 / 4;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-
-                    p {
-                        color: white;  /* Darker green for balance */
-                        opacity: 0.8;
-                        font-size: 4.5rem;
-                    }
-
-                    background: linear-gradient(135deg,rgb(91, 177, 243), #B3E0FF);  /* Light blue gradient for balance */
-                    border: 2px solid #FFFFFF;
-                    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-                    border-radius: 20px;
-                    padding: 1rem;
-                    transition: all 0.3s ease;
-                    position: relative;
-                    overflow: hidden;
-
-                    &:hover {
-                        background: linear-gradient(135deg, #B3E0FF, #A6D8FF);  /* Inverted light blue gradient */
-                        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
-                        transform: translateY(-3px);
-                    }
-
-                    &:hover::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: rgba(255, 255, 255, 0.2);
-                        z-index: 0;
-                    }
+                    background: linear-gradient(135deg, #1D4ED8, #3B82F6, #60A5FA);
+                    display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+                    animation: ${balancePulse} 3s ease-in-out infinite, ${slideUpCard} 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+                    p { font-size: 2.5rem; }
                 }
             }
         }
@@ -204,41 +159,27 @@ import History from '../../History/History';
         .history-con {
             grid-column: 4 / -1;
 
-            h2 {
-                margin: 1rem 0;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
             .salary-title {
-                font-size: 1.2rem;
-
+                font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.7);
+                margin: 0.8rem 0 0.4rem;
+                display: flex; align-items: center; justify-content: space-between;
                 span {
-                    font-size: 1.8rem;
+                    font-size: 1.3rem;
+                    background: linear-gradient(135deg, #A78BFA, #F472B6);
+                    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
                 }
             }
 
             .salary-item {
-                background: #FCF6F9;
-                border: 2px solid #FFFFFF;
-                box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-                padding: 1rem;
-                border-radius: 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                transition: all 0.3s ease;
-
-                p {
-                    font-weight: 600;
-                    font-size: 1.6rem;
-                }
-
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.08);
+                padding: 0.8rem 1rem; border-radius: 12px;
+                display: flex; justify-content: space-between; align-items: center;
+                transition: all 0.25s ease; margin-bottom: 0.5rem;
+                p { font-weight: 700; font-size: 1.2rem; color: rgba(255,255,255,0.8); }
                 &:hover {
-                    background-color: #e3d8d8;  /* Light background on hover for salary items */
-                    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
-                    transform: translateY(-3px);
+                    background: rgba(255,255,255,0.08);
+                    transform: translateX(2px);
                 }
             }
         }

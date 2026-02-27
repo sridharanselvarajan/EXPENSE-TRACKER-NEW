@@ -1,7 +1,7 @@
     import axios from "axios";
 import { createContext, useContext, useState } from "react";
 
-    const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api/v1";
+    const BASE_URL = process.env.REACT_APP_API_URL;
     const GlobalContext = createContext(); // Creating the context
 
     export const GlobalProvider = ({ children }) => {
